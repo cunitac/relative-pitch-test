@@ -172,7 +172,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-left: auto;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
 }
 .mode-row {
   display: flex;
@@ -182,16 +183,18 @@ body {
   padding: 3px;
 }
 .mode-btn {
-  padding: .28rem .7rem;
+  flex: 1;
+  padding: .38rem .7rem;
   background: transparent;
   border: none;
   border-radius: 6px;
-  font-size: .78rem;
+  font-size: .82rem;
   font-weight: 700;
   color: var(--dim);
   cursor: pointer;
   transition: .15s;
   white-space: nowrap;
+  text-align: center;
 }
 .mode-btn.active { background: var(--accent); color: #fff; }
 
