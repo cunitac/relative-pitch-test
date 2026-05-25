@@ -226,6 +226,44 @@ let testQuestions = [];
 let testAnswers   = [];
 let testQIdx      = 0;
 
+// Listen state (learn result screen)
+let listenData       = null;  // { correctCents, yourCents, fixedHz, listenMoveMode }
+let listenTimer      = null;
+let activeListenBtn  = null;
+
+
+// ===== LISTEN PLAYBACK =====
+
+function stopListen() {
+  if (listenTimer) { clearTimeout(listenTimer); listenTimer = null; }
+  stopAudio();
+  if (activeListenBtn) {
+    activeListenBtn.textContent = activeListenBtn === listenCorrectBtn
+      ? '▶ 正解を聴く' : '▶ 自分の答えを聴く';
+    activeListenBtn.classList.remove('playing');
+    activeListenBtn = null;
+  }
+}
+
+function playListen(btn, centsVal) {
+  stopListen();
+  if (!listenData) return;
+  ensureCtx();
+  const { fixedHz, listenMoveMode } = listenData;
+  isPlaying = true;
+  if (listenMoveMode === 'upper') {
+    baseNode  = makeTone(fixedHz, 0.34);
+    upperNode = makeTone(fixedHz * Math.pow(2, centsVal / 1200), 0.34);
+  } else {
+    upperNode = makeTone(fixedHz, 0.34);
+    baseNode  = makeTone(fixedHz * Math.pow(2, -centsVal / 1200), 0.34);
+  }
+  btn.textContent = '■ 止める';
+  btn.classList.add('playing');
+  activeListenBtn = btn;
+  listenTimer = setTimeout(stopListen, 3000);
+}
+
 
 // ===== SLIDER HELPERS =====
 // In "base" mode the slider is inverted: right = base up = interval down.
@@ -299,9 +337,12 @@ const backBtn       = document.getElementById('backBtn');
 const scoreNum      = document.getElementById('scoreNum');
 const scoreGrade    = document.getElementById('scoreGrade');
 const resultDl      = document.getElementById('resultDl');
-const retryBtn      = document.getElementById('retryBtn');
-const nextBtn       = document.getElementById('nextBtn');
-const tweetBtn      = document.getElementById('tweetBtn');
+const retryBtn           = document.getElementById('retryBtn');
+const nextBtn            = document.getElementById('nextBtn');
+const tweetBtn           = document.getElementById('tweetBtn');
+const listenBtns         = document.getElementById('listenBtns');
+const listenCorrectBtn   = document.getElementById('listenCorrectBtn');
+const listenYoursBtn     = document.getElementById('listenYoursBtn');
 const testHeader    = document.getElementById('testHeader');
 const modeToggles   = document.getElementById('modeToggles');
 const testQNum      = document.getElementById('testQNum');
@@ -447,7 +488,7 @@ function setScoreDisplay(el, score) {
 }
 
 // Show result screen — used by both learn and test (per-question)
-function showResultScreen({ score, dev, extraDl = '', showRetry, showTweet, nextLabel, onNext, onTweet }) {
+function showResultScreen({ score, dev, extraDl = '', showRetry, showTweet, showListen = false, nextLabel, onNext, onTweet }) {
   const absD  = Math.abs(dev);
   const sign  = dev >= 0 ? '+' : '';
   const color = scoreColor(absD);
@@ -464,8 +505,10 @@ function showResultScreen({ score, dev, extraDl = '', showRetry, showTweet, next
     `<dt>ずれ</dt><dd style="color:${color}">${sign}${dev.toFixed(2)} セント</dd>` +
     extraDl;
 
-  retryBtn.hidden = !showRetry;
-  tweetBtn.hidden = !showTweet;
+  retryBtn.hidden  = !showRetry;
+  tweetBtn.hidden  = !showTweet;
+  listenBtns.hidden = !showListen;
+  if (!showListen) stopListen();
   nextBtn.textContent = nextLabel;
   nextBtn._onNext = onNext;
   if (onTweet) tweetBtn.onclick = onTweet;
@@ -493,15 +536,19 @@ function showLearnResult() {
     `<dt>目標</dt><dd>${targetHz.toFixed(1)} Hz</dd>` +
     `<dt>あなたの設定</dt><dd>${yourHz.toFixed(1)} Hz</dd>`;
 
-  const tweet = `相対音感テスト「${targetIv.name}」で${score}点！（ずれ${sign}${dev.toFixed(1)}¢）\n#相対音感テスト\nhttps://cunitac.github.io/relative-pitch-test/`;
+  // Store data for listen buttons
+  listenData = {
+    correctCents: targetIv.cents,
+    yourCents:    cents,
+    fixedHz,
+    listenMoveMode: moveMode,
+  };
 
   showResultScreen({
     score, dev, extraDl,
-    showRetry: true, showTweet: true,
+    showRetry: true, showTweet: false, showListen: true,
     nextLabel: '別の音程',
-    onNext: () => showSection(secHome),
-    onTweet: () => window.open(
-      `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet)}`, '_blank'),
+    onNext: () => { stopListen(); showSection(secHome); },
   });
 }
 
@@ -696,6 +743,7 @@ submitBtn.addEventListener('click', () => {
 });
 
 backBtn.addEventListener('click', () => {
+  stopListen();
   stopAudio();
   showSection(secHome);
 });
@@ -705,7 +753,17 @@ nextBtn.addEventListener('click', () => {
   if (typeof nextBtn._onNext === 'function') nextBtn._onNext();
 });
 
+listenCorrectBtn.addEventListener('click', () => {
+  if (activeListenBtn === listenCorrectBtn) { stopListen(); return; }
+  playListen(listenCorrectBtn, listenData.correctCents);
+});
+listenYoursBtn.addEventListener('click', () => {
+  if (activeListenBtn === listenYoursBtn) { stopListen(); return; }
+  playListen(listenYoursBtn, listenData.yourCents);
+});
+
 retryBtn.addEventListener('click', () => {
+  stopListen();
   startLearnGame(targetIv);
 });
 

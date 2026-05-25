@@ -333,6 +333,21 @@ body {
 }
 .result-dl dt { color: var(--dim); }
 .result-dl dd { font-weight: 700; font-variant-numeric: tabular-nums; }
+/* ===== Listen buttons (learn mode result) ===== */
+.listen-btns {
+  display: flex;
+  gap: .5rem;
+  margin-bottom: .75rem;
+}
+.btn-listen {
+  flex: 1;
+  background: var(--bg);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+}
+.btn-listen:hover:not(.playing) { border-color: var(--accent); background: #ede9fe; }
+.btn-listen.playing { background: var(--accent); color: #fff; border-color: var(--accent); }
+
 .result-btns { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; }
 
 /* ===== Test results table ===== */
