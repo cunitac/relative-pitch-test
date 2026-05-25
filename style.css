@@ -298,8 +298,7 @@ body {
 .btn-play:hover:not(:disabled) { background: var(--accent-h); transform: translateY(-1px); }
 .btn-submit { background: #1a1a2e; color: #fff; }
 .btn-submit:hover:not(:disabled) { background: #2a2a4e; transform: translateY(-1px); }
-.btn-tweet { background: #000; color: #fff; border: 1.5px solid #333; }
-.btn-tweet:hover { background: #111; }
+
 
 /* ===== Result card ===== */
 .result-card { text-align: center; }

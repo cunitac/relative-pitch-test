@@ -339,7 +339,6 @@ const scoreGrade    = document.getElementById('scoreGrade');
 const resultDl      = document.getElementById('resultDl');
 const retryBtn           = document.getElementById('retryBtn');
 const nextBtn            = document.getElementById('nextBtn');
-const tweetBtn           = document.getElementById('tweetBtn');
 const listenBtns         = document.getElementById('listenBtns');
 const listenCorrectBtn   = document.getElementById('listenCorrectBtn');
 const listenYoursBtn     = document.getElementById('listenYoursBtn');
@@ -488,7 +487,7 @@ function setScoreDisplay(el, score) {
 }
 
 // Show result screen — used by both learn and test (per-question)
-function showResultScreen({ score, dev, extraDl = '', showRetry, showTweet, showListen = false, nextLabel, onNext, onTweet }) {
+function showResultScreen({ score, dev, extraDl = '', showRetry, showListen = false, nextLabel, onNext }) {
   const absD  = Math.abs(dev);
   const sign  = dev >= 0 ? '+' : '';
   const color = scoreColor(absD);
@@ -505,13 +504,11 @@ function showResultScreen({ score, dev, extraDl = '', showRetry, showTweet, show
     `<dt>ずれ</dt><dd style="color:${color}">${sign}${dev.toFixed(2)} セント</dd>` +
     extraDl;
 
-  retryBtn.hidden  = !showRetry;
-  tweetBtn.hidden  = !showTweet;
+  retryBtn.hidden   = !showRetry;
   listenBtns.hidden = !showListen;
   if (!showListen) stopListen();
   nextBtn.textContent = nextLabel;
   nextBtn._onNext = onNext;
-  if (onTweet) tweetBtn.onclick = onTweet;
 
   showSection(secResult);
 }
@@ -546,7 +543,7 @@ function showLearnResult() {
 
   showResultScreen({
     score, dev, extraDl,
-    showRetry: true, showTweet: false, showListen: true,
+    showRetry: true, showListen: true,
     nextLabel: '別の音程',
     onNext: () => { stopListen(); showSection(secHome); },
   });
@@ -598,7 +595,7 @@ function submitTestAnswer() {
   // Show per-question result before continuing
   showResultScreen({
     score, dev,
-    showRetry: false, showTweet: false,
+    showRetry: false,
     nextLabel: isLast ? '結果を見る' : `次の問題（${testQIdx}/8）→`,
     onNext: isLast ? showTestResult : () => playTestQuestion(testQIdx),
   });
@@ -641,30 +638,6 @@ function showTestResult() {
     `<thead><tr><th>#</th><th>モード</th><th>ずれ</th><th>点</th></tr></thead>` +
     `<tbody>${rows}</tbody>`;
 
-  const ivName = testAnswers[0].iv.name;
-  const tweetText = buildTestTweet(ivName, total, avg, testAnswers);
-  document.getElementById('testTweetBtn').onclick = () =>
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`, '_blank');
-}
-
-function buildTestTweet(ivName, total, avg, answers) {
-  // Pairs: [0,1]=simul+upper, [2,3]=simul+base, [4,5]=alt+upper, [6,7]=alt+base
-  const groups = [
-    { label: '同時・上', idx: [0,1] },
-    { label: '同時・下', idx: [2,3] },
-    { label: '交互・上', idx: [4,5] },
-    { label: '交互・下', idx: [6,7] },
-  ];
-  const lines = groups.map(g =>
-    `${g.label}: ${g.idx.map(i => answers[i].score + '点').join(' / ')}`
-  );
-  return [
-    `🎵 相対音感テスト「${ivName}」`,
-    `合計 ${total.toFixed(1)} / 800点（平均 ${avg.toFixed(1)}点）`,
-    ...lines,
-    '#相対音感テスト',
-    'https://cunitac.github.io/relative-pitch-test/',
-  ].join('\n');
 }
 
 
