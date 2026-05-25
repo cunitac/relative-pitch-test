@@ -185,7 +185,7 @@ body {
 .mode-btn {
   flex: 1;
   padding: .38rem .7rem;
-  background: transparent;
+  background: var(--card);
   border: none;
   border-radius: 6px;
   font-size: .82rem;
