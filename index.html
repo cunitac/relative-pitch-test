@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>相対音感テスト</title>
+  <link rel="stylesheet" href="style.css?v=7">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>相対音感テスト</h1>
+      <p>2音の音程を耳で合わせよう</p>
+    </header>
+
+    <main>
+
+      <!-- ① ホーム（テスト/学習選択 + 音程グリッド） -->
+      <section id="secHome">
+        <div class="card">
+          <div class="tabs" id="modeTabs">
+            <button class="tab active" data-mode="test">テスト（8問）</button>
+            <button class="tab" data-mode="learn">学習</button>
+          </div>
+          <div class="tabs" id="tuningTabs">
+            <button class="tab active" data-tab="just">純正律</button>
+            <button class="tab" data-tab="equal">平均律</button>
+          </div>
+          <p class="home-hint" id="homeHint">音程を選んでテスト開始（4パターン×2問）</p>
+          <div class="iv-grid" id="ivGrid"></div>
+        </div>
+      </section>
+
+      <!-- ② プレイ -->
+      <section id="secPlay" hidden>
+        <div class="card play-card">
+
+          <!-- テスト時のみ -->
+          <div id="testHeader" class="test-header" hidden>
+            <span class="test-q-num" id="testQNum">問題 1 / 8</span>
+            <div class="test-badges">
+              <span class="test-badge" id="testBadge1">同時</span>
+              <span class="test-badge" id="testBadge2">上を動かす</span>
+            </div>
+          </div>
+
+          <div class="play-top">
+            <span class="play-name" id="playName">—</span>
+            <span class="play-ratio" id="playRatio">—</span>
+            <!-- 学習モード時のみ表示 -->
+            <div class="modes-group" id="modeToggles">
+              <div class="mode-row">
+                <button class="mode-btn active" data-mode="simul">同時</button>
+                <button class="mode-btn" data-mode="alt">交互</button>
+              </div>
+              <div class="mode-row">
+                <button class="mode-btn move-btn active" data-move="upper">上を動かす</button>
+                <button class="mode-btn move-btn" data-move="base">下を動かす</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="slider-zone">
+            <input type="range" id="pitchSlider" class="pitch-slider"
+                   min="0" max="200" step="0.1" value="100">
+          </div>
+
+          <div class="fine-btns">
+            <button class="fine-btn" data-delta="-1">−1¢</button>
+            <button class="fine-btn" data-delta="-0.1">−0.1¢</button>
+            <button class="fine-btn" data-delta="0.1">+0.1¢</button>
+            <button class="fine-btn" data-delta="1">+1¢</button>
+          </div>
+          <p class="key-hint">← → キー・スクロールでも調整可</p>
+
+          <div class="play-btns">
+            <button class="btn btn-ghost" id="backBtn">← 戻る</button>
+            <button class="btn btn-play" id="playBtn">▶ 再生</button>
+            <button class="btn btn-submit" id="submitBtn" disabled>回答する</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ③ 結果（学習モード） -->
+      <section id="secResult" hidden>
+        <div class="card result-card">
+          <div class="score-wrap">
+            <div class="score-num" id="scoreNum">—</div>
+            <div class="score-grade" id="scoreGrade">—</div>
+          </div>
+          <dl class="result-dl" id="resultDl"></dl>
+          <div class="result-btns">
+            <button class="btn btn-ghost" id="retryBtn">もう一度</button>
+            <button class="btn btn-ghost" id="nextBtn">別の音程</button>
+            <button class="btn btn-tweet" id="tweetBtn">𝕏 シェア</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ④ テスト結果 -->
+      <section id="secTestResult" hidden>
+        <div class="card">
+          <div class="score-wrap">
+            <div class="score-num" id="testScoreNum">—</div>
+            <div class="score-grade" id="testScoreGrade">—</div>
+          </div>
+          <table class="test-table" id="testTable"></table>
+          <div class="result-btns">
+            <button class="btn btn-ghost" id="testRetryBtn">もう一度</button>
+            <button class="btn btn-ghost" id="testHomeBtn">ホームへ</button>
+            <button class="btn btn-tweet" id="testTweetBtn">𝕏 シェア</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+  <script>
+    // Force fresh load every time (bypass browser cache)
+    (function(){
+      var s = document.createElement('script');
+      s.src = 'app.js?t=' + Date.now();
+      document.currentScript.parentNode.appendChild(s);
+    })();
+  </script>
+</body>
+</html>
