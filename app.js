@@ -493,7 +493,7 @@ function showLearnResult() {
     `<dt>目標</dt><dd>${targetHz.toFixed(1)} Hz</dd>` +
     `<dt>あなたの設定</dt><dd>${yourHz.toFixed(1)} Hz</dd>`;
 
-  const tweet = `相対音感テスト「${targetIv.name}」で${score}点！（ずれ${sign}${dev.toFixed(1)}¢）#相対音感テスト`;
+  const tweet = `相対音感テスト「${targetIv.name}」で${score}点！（ずれ${sign}${dev.toFixed(1)}¢）\n#相対音感テスト\nhttps://cunitac.github.io/relative-pitch-test/`;
 
   showResultScreen({
     score, dev, extraDl,
@@ -616,6 +616,7 @@ function buildTestTweet(ivName, total, avg, answers) {
     `合計 ${total.toFixed(1)} / 800点（平均 ${avg.toFixed(1)}点）`,
     ...lines,
     '#相対音感テスト',
+    'https://cunitac.github.io/relative-pitch-test/',
   ].join('\n');
 }
 
