@@ -335,9 +335,11 @@ body {
 /* ===== Listen buttons (learn mode result) ===== */
 .listen-btns {
   display: flex;
-  gap: .5rem;
+  flex-direction: column;
+  gap: .4rem;
   margin-bottom: .75rem;
 }
+.listen-play-row { display: flex; gap: .5rem; }
 .btn-listen {
   flex: 1;
   background: var(--bg);

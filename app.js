@@ -230,6 +230,7 @@ let testQIdx      = 0;
 let listenData       = null;  // { correctCents, yourCents, fixedHz, listenMoveMode }
 let listenTimer      = null;
 let activeListenBtn  = null;
+let listenPlayMode   = 'simul'; // 'simul' | 'alt'
 
 
 // ===== LISTEN PLAYBACK =====
@@ -250,13 +251,22 @@ function playListen(btn, centsVal) {
   if (!listenData) return;
   ensureCtx();
   const { fixedHz, listenMoveMode } = listenData;
-  isPlaying = true;
+  let baseHz, upperHz;
   if (listenMoveMode === 'upper') {
-    baseNode  = makeTone(fixedHz, 0.34);
-    upperNode = makeTone(fixedHz * Math.pow(2, centsVal / 1200), 0.34);
+    baseHz  = fixedHz;
+    upperHz = fixedHz * Math.pow(2, centsVal / 1200);
   } else {
-    upperNode = makeTone(fixedHz, 0.34);
-    baseNode  = makeTone(fixedHz * Math.pow(2, -centsVal / 1200), 0.34);
+    upperHz = fixedHz;
+    baseHz  = fixedHz * Math.pow(2, -centsVal / 1200);
+  }
+  isPlaying = true;
+  if (listenPlayMode === 'alt') {
+    baseNode  = makeTone(baseHz, 0.34);
+    upperNode = makeTone(upperHz, 0);
+    startAlternating();
+  } else {
+    baseNode  = makeTone(baseHz, 0.34);
+    upperNode = makeTone(upperHz, 0.34);
   }
   btn.textContent = '■ 止める';
   btn.classList.add('playing');
@@ -724,6 +734,15 @@ backBtn.addEventListener('click', () => {
 // nextBtn handler is set dynamically by showResultScreen
 nextBtn.addEventListener('click', () => {
   if (typeof nextBtn._onNext === 'function') nextBtn._onNext();
+});
+
+document.querySelectorAll('[data-lmode]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    listenPlayMode = btn.dataset.lmode;
+    document.querySelectorAll('[data-lmode]').forEach(b =>
+      b.classList.toggle('active', b.dataset.lmode === listenPlayMode));
+    stopListen();
+  });
 });
 
 listenCorrectBtn.addEventListener('click', () => {
